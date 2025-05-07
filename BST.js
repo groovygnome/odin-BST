@@ -105,35 +105,90 @@ class BST {
         if (currNode.left != null) queue.push(currNode.left);
         if (currNode.right != null) queue.push(currNode.right);
       }
-    }else{
+    } else {
       console.log('Use a function as an input');
       return;
     }
 
   }
-  
-  inOrder(callback, node = this.root){
-    if(node != null){
-    	this.inOrder(callback, node.left);
-    	callback(node);
-    	this.inOrder(callback, node.right);
+
+  inOrder(callback, node = this.root) {
+    if (node != null) {
+      this.inOrder(callback, node.left);
+      callback(node);
+      this.inOrder(callback, node.right);
     }
   }
-  
-  preOrder(callback, node = this.root){
-    if(node != null){
+
+  preOrder(callback, node = this.root) {
+    if (node != null) {
       callback(node);
-    	this.preOrder(callback, node.left);
-    	this.preOrder(callback, node.right);
+      this.preOrder(callback, node.left);
+      this.preOrder(callback, node.right);
     }
   }
-  
-  postOrder(callback, node = this.root){
-    if(node != null){
-    	this.postOrder(callback, node.left);
-    	this.postOrder(callback, node.right);
+
+  postOrder(callback, node = this.root) {
+    if (node != null) {
+      this.postOrder(callback, node.left);
+      this.postOrder(callback, node.right);
       callback(node);
     }
+  }
+
+  height(value) {
+    if (this.root === null) return null;
+    let node = this.find(value);
+    if (node === null) return null;
+    const computeHeight = (n) => {
+      if (n === null) return -1;
+      let leftHeight = 1 + computeHeight(n.left);
+      let rightHeight = 1 + computeHeight(n.right);
+      return Math.max(leftHeight, rightHeight);
+    }
+    return computeHeight(node);
+  }
+
+  depth(value) {
+    let currNode = this.root;
+    let depth = 0;
+    while (currNode != null) {
+      if (currNode.value == value) {
+        return depth;
+      } else {
+        if (value > currNode.value) {
+          currNode = currNode.right;
+        } else if (value < currNode.value) {
+          currNode = currNode.left;
+        }
+        depth++;
+      }
+    }
+    return null;
+  }
+
+  isBalanced() {
+    const computeBalanced = (n) => {
+      if (n === null) return true;
+      let leftHeight = 0;
+      let rightHeight = 0;
+      if(n.left) leftHeight = this.height(n.left.value);
+      if(n.right) rightHeight = this.height(n.right.value);
+      if (Math.abs(leftHeight - rightHeight) <= 1) {
+        return true && computeBalanced(n.left) && computeBalanced(n.right);
+      }
+      return false;
+    }
+    return computeBalanced(this.root);
+  }
+
+  rebalance() {
+    let newArr = [];
+    this.inOrder((node) => {
+      newArr.push(node.value);
+    });
+    this.root = null;
+    this.root = this.buildTree(newArr, this.root);
   }
 
   prettyPrint(node = this.root, prefix = "", isLeft = true) {
@@ -163,10 +218,53 @@ class TreeNode {
 
 let test = new BST([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 test.prettyPrint();
-test.levelOrder((node) => {console.log(node.value)});
+console.log(test.isBalanced());
+let testarr = [];
+test.levelOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
 console.log('---------------');
-test.inOrder((node) => {console.log(node.value)});
+testarr = [];
+test.inOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
 console.log('---------------');
-test.preOrder((node) => {console.log(node.value)});
+testarr = [];
+test.preOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
 console.log('---------------');
-test.postOrder((node) => {console.log(node.value)});
+testarr = [];
+test.postOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+test.rebalance();
+test.prettyPrint();
+console.log(test.isBalanced());
+testarr = [];
+test.levelOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.inOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.preOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.postOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
