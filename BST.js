@@ -172,8 +172,8 @@ class BST {
       if (n === null) return true;
       let leftHeight = 0;
       let rightHeight = 0;
-      if(n.left) leftHeight = this.height(n.left.value);
-      if(n.right) rightHeight = this.height(n.right.value);
+      if (n.left) leftHeight = this.height(n.left.value);
+      if (n.right) rightHeight = this.height(n.right.value);
       if (Math.abs(leftHeight - rightHeight) <= 1) {
         return true && computeBalanced(n.left) && computeBalanced(n.right);
       }
@@ -187,8 +187,16 @@ class BST {
     this.inOrder((node) => {
       newArr.push(node.value);
     });
-    this.root = null;
-    this.root = this.buildTree(newArr, this.root);
+    const arrToBst = (arr, start = 0, end = arr.length-1) => {
+      if (start > end) return null;
+      let mid = start + Math.floor((end - start) / 2);
+      let root = new TreeNode(arr[mid]);
+      root.left = arrToBst(arr, start, mid - 1);
+      root.right = arrToBst(arr, mid + 1, end);
+
+      return root;
+    }
+    this.root = arrToBst(newArr);
   }
 
   prettyPrint(node = this.root, prefix = "", isLeft = true) {
@@ -242,6 +250,8 @@ test.postOrder((node) => {
   testarr.push(node.value);
 });
 console.log(testarr);
+
+
 test.rebalance();
 test.prettyPrint();
 console.log(test.isBalanced());
