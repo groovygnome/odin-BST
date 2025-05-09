@@ -1,107 +1,280 @@
-function knightMoves(start, end) {
-  if (!checkCoordinate(start) || !checkCoordinate(end)) {
-    console.log('Please enter a valid start and end value. All coordinates should be in the range [0,7]');
-  }
-  let trails = new Graph(start);
-  let visited = [];
-  visited.push(trails.root.toString());
-  let queue = [];
-  queue.push(trails.root);
-  let i = 0;
-  let foundNode = null;
-  while (i < visited.length) {
-    let node = queue.shift();
-    if (node.data.toString() === end.toString() && foundNode === null) {
-      foundNode = node;
-      break;
-    }
-    move0 = new GraphNode([node.data[0] + 2, node.data[1] + 1], node);
-    move1 = new GraphNode([node.data[0] + 2, node.data[1] - 1], node);
-    move2 = new GraphNode([node.data[0] - 2, node.data[1] + 1], node);
-    move3 = new GraphNode([node.data[0] - 2, node.data[1] - 1], node);
-    move4 = new GraphNode([node.data[0] + 1, node.data[1] + 2], node);
-    move5 = new GraphNode([node.data[0] + 1, node.data[1] - 2], node);
-    move6 = new GraphNode([node.data[0] - 1, node.data[1] + 2], node);
-    move7 = new GraphNode([node.data[0] - 1, node.data[1] - 2], node);
-    if (checkCoordinate(move0.data) && !visited.includes(move0.data.toString())) {
-      node.addEdge(move0);
-      visited.push(move0.data.toString());
-      queue.push(move0);
-    }
-    if (checkCoordinate(move1.data) && !visited.includes(move1.data.toString())) {
-      node.addEdge(move1);
-      visited.push(move1.data.toString());
-      queue.push(move1);
-    }
-    if (checkCoordinate(move2.data) && !visited.includes(move2.data.toString())) {
-      node.addEdge(move2);
-      visited.push(move2.data.toString());
-      queue.push(move2);
-    }
-    if (checkCoordinate(move3.data) && !visited.includes(move3.data.toString())) {
-      node.addEdge(move3);
-      visited.push(move3.data.toString());
-      queue.push(move3);
-    }
-    if (checkCoordinate(move4.data) && !visited.includes(move4.data.toString())) {
-      node.addEdge(move4);
-      visited.push(move4.data.toString());
-      queue.push(move4);
-    }
-    if (checkCoordinate(move5.data) && !visited.includes(move5.data.toString())) {
-      node.addEdge(move5);
-      visited.push(move5.data.toString());
-      queue.push(move5);
-    }
-    if (checkCoordinate(move6.data) && !visited.includes(move6.data.toString())) {
-      node.addEdge(move6);
-      visited.push(move6.data.toString());
-      queue.push(move6);
-    }
-    if (checkCoordinate(move7.data) && !visited.includes(move7.data.toString())) {
-      node.addEdge(move7);
-      visited.push(move7.data.toString());
-      queue.push(move7);
-    }
-    i++;
-  }
-  let travail = [];
-  while (foundNode != null) {
-    travail.unshift(foundNode.data);
-    foundNode = foundNode.parent;
+class BST {
+  constructor(array) {
+    this.root = null;
+    this.root = this.buildTree(array, this.root);
   }
 
-  return travail;
-}
+  buildTree(array, node) {
+    /** if(array.length == 0) return node;
+     let newNode = new TreeNode(array[0]);
+     array.shift();
+     if (!node) node = newNode;
+     if (array[0] < node.value) node.left = this.buildTree(array, node.left);
+     if (array[0] > node.value) node.right = this.buildTree(array, node.right);
+     if (array[0] == node.value) array.shift;
+     **/
+    for (let i = 0; i < array.length; i++) {
+      node = this.insert(array[i], node);
+    }
+    return node;
+  }
 
-function checkCoordinate(coord) {
-  if (coord[0] < 0 || coord[0] > 7 || coord[1] < 0 || coord[1] > 7) {
+  insert(value, node) {
+    if (!node) return new TreeNode(value);
+    if (value < node.value) node.left = this.insert(value, node.left);
+    if (value > node.value) node.right = this.insert(value, node.right);
+    if (value == node.value) return node;
+    return node;
+  }
+
+  deleteItem(value) {
+    if (this.root == null) {
+      return false;
+    }
+    let currNode = this.root;
+    let prevNode = null;
+    while (currNode != null) {
+      if (value > currNode.value) {
+        prevNode = currNode;
+        currNode = currNode.right;
+      }
+      if (value < currNode.value) {
+        prevNode = currNode;
+        currNode = currNode.left;
+      }
+      if (value == currNode.value) {
+        if (currNode.left && currNode.right) {
+          let succ = currNode.right;
+          while (succ != null && succ.left != null) {
+            succ = succ.left;
+          }
+          deleteItem(succ.value);
+          currNode.value = succ.value;
+
+        } else if (!currNode.left && currNode.right) {
+          if (prevNode != null) {
+            value > prevNode.value ? prevNode.right = currNode.right : prevNode.left = currNode.right;
+            currNode = null;
+          } else {
+            this.root = currNode.right;
+          }
+        } else if (currNode.left && !currNode.right) {
+          if (prevNode != null) {
+            value > prevNode.value ? prevNode.right = currNode.left : prevNode.left = currNode.left;
+            currNode = null;
+          } else {
+            this.root = currNode.left;
+          }
+        } else if (!currNode.left && !currNode.right) {
+          if (prevNode != null) {
+            value > prevNode.value ? prevNode.right = currNode.right : prevNode.left = currNode.right;
+            currNode = null;
+          } else {
+            this.root = null;
+          }
+        }
+        return true;
+      }
+    }
     return false;
-  } else {
-    return true;
   }
+
+  find(value) {
+    let currNode = this.root;
+    while (currNode != null) {
+      if (currNode.value == value) {
+        return currNode;
+      } else {
+        if (value > currNode.value) {
+          currNode = currNode.right;
+        } else if (value < currNode.value) {
+          currNode = currNode.left;
+        }
+      }
+    }
+    return null;
+  }
+
+  levelOrder(callback) {
+    if (typeof callback === 'function') {
+      let queue = [];
+      queue.push(this.root);
+      while (queue.length > 0) {
+        let currNode = queue.shift();
+        callback(currNode);
+        if (currNode.left != null) queue.push(currNode.left);
+        if (currNode.right != null) queue.push(currNode.right);
+      }
+    } else {
+      console.log('Use a function as an input');
+      return;
+    }
+
+  }
+
+  inOrder(callback, node = this.root) {
+    if (node != null) {
+      this.inOrder(callback, node.left);
+      callback(node);
+      this.inOrder(callback, node.right);
+    }
+  }
+
+  preOrder(callback, node = this.root) {
+    if (node != null) {
+      callback(node);
+      this.preOrder(callback, node.left);
+      this.preOrder(callback, node.right);
+    }
+  }
+
+  postOrder(callback, node = this.root) {
+    if (node != null) {
+      this.postOrder(callback, node.left);
+      this.postOrder(callback, node.right);
+      callback(node);
+    }
+  }
+
+  height(value) {
+    if (this.root === null) return null;
+    let node = this.find(value);
+    if (node === null) return null;
+    const computeHeight = (n) => {
+      if (n === null) return -1;
+      let leftHeight = 1 + computeHeight(n.left);
+      let rightHeight = 1 + computeHeight(n.right);
+      return Math.max(leftHeight, rightHeight);
+    }
+    return computeHeight(node);
+  }
+
+  depth(value) {
+    let currNode = this.root;
+    let depth = 0;
+    while (currNode != null) {
+      if (currNode.value == value) {
+        return depth;
+      } else {
+        if (value > currNode.value) {
+          currNode = currNode.right;
+        } else if (value < currNode.value) {
+          currNode = currNode.left;
+        }
+        depth++;
+      }
+    }
+    return null;
+  }
+
+  isBalanced() {
+    const computeBalanced = (n) => {
+      if (n === null) return true;
+      let leftHeight = 0;
+      let rightHeight = 0;
+      if (n.left) leftHeight = this.height(n.left.value);
+      if (n.right) rightHeight = this.height(n.right.value);
+      if (Math.abs(leftHeight - rightHeight) <= 1) {
+        return true && computeBalanced(n.left) && computeBalanced(n.right);
+      }
+      return false;
+    }
+    return computeBalanced(this.root);
+  }
+
+  rebalance() {
+    let newArr = [];
+    this.inOrder((node) => {
+      newArr.push(node.value);
+    });
+    const arrToBst = (arr, start = 0, end = arr.length-1) => {
+      if (start > end) return null;
+      let mid = start + Math.floor((end - start) / 2);
+      let root = new TreeNode(arr[mid]);
+      root.left = arrToBst(arr, start, mid - 1);
+      root.right = arrToBst(arr, mid + 1, end);
+
+      return root;
+    }
+    this.root = arrToBst(newArr);
+  }
+
+  prettyPrint(node = this.root, prefix = "", isLeft = true) {
+    if (node === null) {
+      return;
+    }
+    if (node.right !== null) {
+      this.prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+    }
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
+    if (node.left !== null) {
+      this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+    }
+  };
+
+
 }
 
 
-class Graph {
-  constructor(data) {
-    this.root = new GraphNode(data);
+class TreeNode {
+  constructor(value) {
+    this.value = value;
+    this.left = null;
+    this.right = null;
   }
 }
 
-class GraphNode {
-  constructor(data, parent = null) {
-    this.data = data;
-    this.parent = parent;
-    this.edges = [];
-  }
+let test = new BST([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+test.prettyPrint();
+console.log(test.isBalanced());
+let testarr = [];
+test.levelOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.inOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.preOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.postOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
 
-  addEdge(newNode) {
-    this.edges.push(newNode);
-  }
-}
 
-console.log(knightMoves([0,0],[3,3]));
-console.log(knightMoves([3,3],[0,0]));
-console.log(knightMoves([0,0],[7,7]));
-console.log(knightMoves([3,3],[4,3]));
+test.rebalance();
+test.prettyPrint();
+console.log(test.isBalanced());
+testarr = [];
+test.levelOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.inOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.preOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
+console.log('---------------');
+testarr = [];
+test.postOrder((node) => {
+  testarr.push(node.value);
+});
+console.log(testarr);
